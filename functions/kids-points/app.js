@@ -32,14 +32,39 @@ const AVATARS = ['🦊', '🐼', '🐯', '🐰', '🐻', '🐸', '🐵', '🐧',
 //  3) 本地 data/data.json —— 本地开发兜底
 let db;
 
-/* --- PostgreSQL（Render / Railway / VPS 首选） --- */
+/* --- PostgreSQL（Zeabur / Render / Railway / VPS 通用） --- */
 let pgPool = null;
-const DATABASE_URL = process.env.DATABASE_URL || '';
+
+// 各家托管商注入的数据库变量名都不一样，这里全部支持，自动识别：
+//   Render      -> DATABASE_URL
+//   Zeabur      -> POSTGRES_CONNECTION_STRING（或 POSTGRES_HOST 等拆开的变量）
+//   Railway/Vercel -> DATABASE_URL / POSTGRES_URL
+function resolvePgUrl() {
+  const direct = (
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_CONNECTION_STRING ||
+    process.env.POSTGRES_URL ||
+    process.env.POSTGRES_PRISMA_URL ||
+    ''
+  ).trim();
+  if (direct) return direct;
+  // Zeabur 数据库服务常见的拆开写法
+  if (process.env.POSTGRES_HOST) {
+    const user = process.env.POSTGRES_USERNAME || process.env.POSTGRES_USER || 'postgres';
+    const pass = process.env.POSTGRES_PASSWORD || '';
+    const host = process.env.POSTGRES_HOST;
+    const port = process.env.POSTGRES_PORT || '5432';
+    const dbname = process.env.POSTGRES_DB || 'postgres';
+    return `postgres://${encodeURIComponent(user)}:${encodeURIComponent(pass)}@${host}:${port}/${dbname}`;
+  }
+  return '';
+}
 
 // 托管商差异：有的数据库要求 SSL（自签证书），有的内网直连不支持 SSL。
 // 这里先试 SSL，失败自动回落明文，确保两种环境都能连上。
 async function initPg() {
-  if (!DATABASE_URL || pgPool) return pgPool;
+  const pgUrl = resolvePgUrl();
+  if (!pgUrl || pgPool) return pgPool;
   let lastErr = null;
   try {
     const { Pool } = require('pg');
@@ -47,7 +72,7 @@ async function initPg() {
       let pool = null;
       try {
         pool = new Pool({
-          connectionString: DATABASE_URL,
+          connectionString: pgUrl,
           ssl,
           max: 5,
           idleTimeoutMillis: 30000,

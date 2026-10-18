@@ -2,14 +2,15 @@
 
 仿自动售货机扫码选购的家庭积分系统：孩子扫码打开礼物货架，提交兑换申请；管理员后台录入礼品、创建账号、手动加减积分、审核申请（通过自动扣分）。
 
-## 部署到公网（推荐 Render，免费且数据不丢）
+## 部署到公网
 
-完整步骤见 👉 **[DEPLOY-RENDER.md](DEPLOY-RENDER.md)**（约 5 分钟，含免费 PostgreSQL 数据库，积分数据永久保存）。
+推荐路线：**[DEPLOY-ZEABUR.md](DEPLOY-ZEABUR.md)**（Zeabur，免费额度，中文界面，不需要国际信用卡，约 5 分钟）
 
-简单说：把本仓库推到 GitHub → 在 https://dashboard.render.com/blueprints 用 `render.yaml` 一键创建「Web 服务 + PostgreSQL」→ 拿到 `https://xxx.onrender.com` 就能用。
+备用路线：
+- **[DEPLOY-RENDER.md](DEPLOY-RENDER.md)** —— Render（需 Visa/Mastercard 验证身份，银联卡不行）
+- **[DEPLOY.md](DEPLOY.md)** —— 腾讯云 CloudBase（**体验版不支持本应用所需能力，会部署失败**）
 
-> 已适配云主机部署：检测到 `DATABASE_URL` 自动启用 PostgreSQL 持久化（否则降级为本地文件），支持 SSL / 明文自动嗅探。
-> 原来的腾讯云 CloudBase 方案见 [DEPLOY.md](DEPLOY.md)（**注意：CloudBase 体验版不支持本应用所需能力，会部署失败**）。
+> 代码已适配各家托管平台：自动识别 `DATABASE_URL` / `POSTGRES_CONNECTION_STRING` / `POSTGRES_HOST` 等环境变量启用 PostgreSQL 持久化（连不上则安全降级为本地文件），SSL 与明文双通道自动嗅探。
 
 ## 运行
 
