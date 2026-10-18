@@ -1,0 +1,34 @@
+# 依赖
+node_modules/
+
+# 用户数据（包含积分、账号、礼品图片，敏感且量大）
+data/
+uploads/
+
+# 环境变量（含密钥，禁止提交）
+.env
+.env.local
+
+# 系统文件
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# 临时文件
+*.log
+*.err
+*.tmp
+data.json.tmp
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# IDE 本地规则（项目相关数据，非源代码）
+.codebuddy/
+
+# 调试期临时产物（从云端下载的函数包、zip、临时脚本）
+downloaded/
+downloaded2/
+*.zip

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>积分礼物小卖部</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- 选择账号 -->
+  <div id="loginView" class="hidden">
+    <div class="login-box">
+      <div class="login-title">🎁 积分礼物小卖部</div>
+      <p class="login-sub">输入你的名字，开始挑礼物吧~</p>
+      <div class="login-form">
+        <input type="text" id="loginName" placeholder="我的名字" maxlength="12" autocomplete="off">
+        <button id="btnLogin" class="btn-redeem">进入小卖部</button>
+      </div>
+      <p id="loginErr" class="login-err hidden"></p>
+    </div>
+  </div>
+
+  <!-- 主界面 -->
+  <div id="mainView" class="hidden">
+    <header class="kid-header">
+      <div class="kid-info"><span id="kidAvatar"></span><span id="kidName"></span></div>
+      <div class="points-chip">⭐ <b id="kidPoints">0</b> 分</div>
+      <button id="btnLogout" class="ghost-btn">切换</button>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="shelf">🎁 礼物货架</button>
+      <button class="tab" data-tab="records">📋 我的记录</button>
+    </nav>
+
+    <main>
+      <section id="tab-shelf">
+        <div id="giftGrid" class="gift-grid"></div>
+      </section>
+      <section id="tab-records" class="hidden">
+        <h3 class="sec-title">⭐ 积分变化</h3>
+        <div id="historyList" class="record-list"></div>
+        <h3 class="sec-title">🎁 兑换申请</h3>
+        <div id="requestList" class="record-list"></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- 兑换确认弹窗 -->
+<div id="modalMask" class="modal-mask hidden">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-actions">
+      <button id="modalCancel" class="btn-plain">取消</button>
+      <button id="modalOk" class="btn-primary">确定</button>
+    </div>
+  </div>
+</div>
+
+<script src="kid.js"></script>
+</body>
+</html>

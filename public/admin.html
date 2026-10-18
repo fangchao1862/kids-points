@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>积分礼物小卖部 · 管理后台</title>
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- 登录 -->
+<div id="loginView" class="login-wrap">
+  <form class="login-card" id="loginForm">
+    <div class="login-logo">🛒</div>
+    <h1>积分礼物小卖部 · 管理后台</h1>
+    <input type="password" id="loginPwd" placeholder="请输入管理密码" autocomplete="current-password">
+    <button class="btn-primary block" type="submit">登 录</button>
+    <p class="hint">默认密码 admin123，登录后可修改</p>
+  </form>
+</div>
+
+<!-- 主界面 -->
+<div id="mainView" class="layout hidden">
+  <aside class="sidebar">
+    <div class="brand">🛒 积分礼物小卖部<br><small>管理后台</small></div>
+    <nav>
+      <button class="nav-btn active" data-view="requests">📨 兑换申请<span id="pendingBadge" class="badge hidden"></span></button>
+      <button class="nav-btn" data-view="gifts">🎁 礼品管理</button>
+      <button class="nav-btn" data-view="kids">👶 小朋友账号</button>
+      <button class="nav-btn" data-view="qr">📱 访问二维码</button>
+    </nav>
+    <div class="side-foot">
+      <button id="btnPwd" class="link-btn">改密码</button>
+      <button id="btnLogout" class="link-btn">退出</button>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- 兑换申请 -->
+    <section id="view-requests" class="view">
+      <div class="view-head">
+        <h2>兑换申请</h2>
+        <div class="filters" id="reqFilters">
+          <button class="filter active" data-status="pending">待审核</button>
+          <button class="filter" data-status="approved">已通过</button>
+          <button class="filter" data-status="rejected">已驳回</button>
+          <button class="filter" data-status="all">全部</button>
+        </div>
+      </div>
+      <div id="reqList" class="req-list"></div>
+    </section>
+
+    <!-- 礼品管理 -->
+    <section id="view-gifts" class="view hidden">
+      <div class="view-head">
+        <h2>礼品管理</h2>
+        <button class="btn-primary" id="btnAddGift">＋ 新增礼品</button>
+      </div>
+      <div id="giftGrid" class="gift-grid"></div>
+    </section>
+
+    <!-- 小朋友账号 -->
+    <section id="view-kids" class="view hidden">
+      <div class="view-head">
+        <h2>小朋友账号</h2>
+        <button class="btn-primary" id="btnAddKid">＋ 添加小朋友</button>
+      </div>
+      <div id="kidList" class="kid-list"></div>
+    </section>
+
+    <!-- 二维码 -->
+    <section id="view-qr" class="view hidden">
+      <div class="view-head"><h2>访问二维码</h2></div>
+      <p class="qr-tip">📱 打印两张二维码贴在教室或家里：<b>学生端</b>给孩子扫码挑礼物，<b>管理员端</b>给自己扫码进后台。本地使用需手机与电脑同一 WiFi；部署到公网后，任何网络都能扫码访问。</p>
+      <div class="qr-grid">
+        <div class="qr-card">
+          <h4>🧒 学生端 · 礼物货架</h4>
+          <img class="qrImg" data-path="/" alt="学生端二维码">
+          <p class="qr-sub" data-path="/"></p>
+        </div>
+        <div class="qr-card">
+          <h4>🛠 管理员端 · 管理后台</h4>
+          <img class="qrImg" data-path="/admin" alt="管理员端二维码">
+          <p class="qr-sub" data-path="/admin"></p>
+        </div>
+      </div>
+      <div class="qr-card">
+        <label>访问地址前缀（可修改，两张码同时更新）</label>
+        <div class="qr-row">
+          <input id="qrUrl" type="text">
+          <button class="btn-primary" id="btnQrRefresh">刷新二维码</button>
+        </div>
+        <button class="btn-primary block" id="btnQrPrint">🖨 打印两张二维码</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- 礼品弹窗 -->
+<div id="giftModal" class="mask hidden">
+  <div class="modal">
+    <h3 id="giftModalTitle">新增礼品</h3>
+    <label>礼品图片（可选）</label>
+    <div class="upload-row">
+      <div id="giftPreview" class="upload-preview">🎁</div>
+      <div>
+        <input type="file" id="giftFile" accept="image/png,image/jpeg,image/webp,image/gif">
+        <p class="hint" style="text-align:left">选择图片后自动上传，不上传则显示下方图标</p>
+      </div>
+    </div>
+    <label>图标（不上传图片时显示）</label>
+    <input type="text" id="giftEmoji" maxlength="4" placeholder="🎁">
+    <label>礼品名称</label>
+    <input type="text" id="giftName" placeholder="如：盲盒玩具">
+    <label>兑换所需积分</label>
+    <input type="number" id="giftPoints" min="1" step="1" placeholder="如：50">
+    <label class="check-row"><input type="checkbox" id="giftOnShelf" checked> 上架（孩子端可见）</label>
+    <div class="modal-actions">
+      <button class="btn-plain" data-close>取消</button>
+      <button class="btn-primary" id="giftSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 添加小朋友弹窗 -->
+<div id="kidModal" class="mask hidden">
+  <div class="modal">
+    <h3>添加小朋友账号</h3>
+    <label>头像（点击切换）</label>
+    <button id="kidAvatarBtn" class="avatar-pick" type="button">🐼</button>
+    <label>昵称</label>
+    <input type="text" id="kidName" placeholder="如：小明">
+    <div class="modal-actions">
+      <button class="btn-plain" data-close>取消</button>
+      <button class="btn-primary" id="kidSave">创建</button>
+    </div>
+  </div>
+</div>
+
+<!-- 积分调整弹窗 -->
+<div id="pointsModal" class="mask hidden">
+  <div class="modal">
+    <h3 id="pointsTitle">积分管理</h3>
+    <p class="hint" id="pointsNow"></p>
+    <label>调整分值（正整数）</label>
+    <div class="quick-row">
+      <button type="button" data-v="1">1</button>
+      <button type="button" data-v="5">5</button>
+      <button type="button" data-v="10">10</button>
+      <button type="button" data-v="50">50</button>
+      <button type="button" data-v="100">100</button>
+    </div>
+    <input type="number" id="pointsAmount" min="1" step="1" placeholder="分值">
+    <label>原因（可选，会显示在孩子记录里）</label>
+    <input type="text" id="pointsReason" placeholder="如：帮忙做家务">
+    <div class="modal-actions">
+      <button class="btn-danger-plain" id="pointsMinus">− 扣分</button>
+      <button class="btn-primary" id="pointsPlus">＋ 加分</button>
+    </div>
+  </div>
+</div>
+
+<!-- 修改密码弹窗 -->
+<div id="pwdModal" class="mask hidden">
+  <div class="modal">
+    <h3>修改管理密码</h3>
+    <label>新密码（至少 4 位）</label>
+    <input type="password" id="pwdNew" autocomplete="new-password">
+    <div class="modal-actions">
+      <button class="btn-plain" data-close>取消</button>
+      <button class="btn-primary" id="pwdSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="admin.js"></script>
+</body>
+</html>
