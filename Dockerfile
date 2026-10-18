@@ -15,6 +15,8 @@ RUN npm ci --omit=dev || npm install --omit=dev
 COPY server.js ./
 COPY public ./public
 COPY functions ./functions
+# 历史数据种子：首次连上数据库时自动导入（幂等，有数据则跳过）
+COPY seed-data.json ./
 
 # 数据与上传目录（配了 PostgreSQL 时数据落库，这里仅作兜底）
 RUN mkdir -p /app/data /app/uploads

@@ -128,12 +128,44 @@ function seedDb() {
   };
 }
 
+// 首次部署的种子数据：容器内没有历史数据文件，靠它把老数据（含礼品图片）迁进来
+const SEED_FILE = path.join(ROOT_DIR, 'seed-data.json');
+
+// 数据库为空时才导入，之后有数据就不再覆盖（幂等、安全）
+async function importSeed() {
+  if (!pgPool || !fs.existsSync(SEED_FILE)) return;
+  try {
+    const existed = await pgPool.query('SELECT 1 FROM kids_store_data WHERE id = $1', ['main']);
+    if (existed.rows.length) return; // 已有数据，保持原样
+    const seed = JSON.parse(fs.readFileSync(SEED_FILE, 'utf8'));
+    if (!seed || !seed.data) return;
+    await pgPool.query(
+      `INSERT INTO kids_store_data (id, payload, updated_at) VALUES ($1, $2, $3)
+       ON CONFLICT (id) DO NOTHING`,
+      ['main', JSON.stringify(seed.data), Date.now()]
+    );
+    let imgCount = 0;
+    for (const [name, val] of Object.entries(seed.images || {})) {
+      await pgPool.query(
+        `INSERT INTO kids_store_images (name, mime, data, created_at) VALUES ($1, $2, $3, $4)
+         ON CONFLICT (name) DO NOTHING`,
+        [name, val.mime, val.data, Date.now()]
+      );
+      imgCount++;
+    }
+    console.log(`[存储] 已从 seed-data.json 导入历史数据：${seed.data.kids.length} 位孩子、${seed.data.gifts.length} 件礼品、${imgCount} 张图片`);
+  } catch (e) {
+    console.error('[存储] 导入种子数据失败:', e.message);
+  }
+}
+
 async function loadDb() {
   // 1) PostgreSQL
   await initPg();
   if (pgPool) {
     try {
       await pgInit();
+      await importSeed();
       const r = await pgPool.query('SELECT payload FROM kids_store_data WHERE id = $1', ['main']);
       if (r.rows.length && r.rows[0].payload) {
         db = r.rows[0].payload;
