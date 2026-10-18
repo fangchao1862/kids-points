@@ -4,9 +4,10 @@
 
 ## 部署到公网
 
-推荐路线：**[DEPLOY-ZEABUR.md](DEPLOY-ZEABUR.md)**（Zeabur，免费额度，中文界面，不需要国际信用卡，约 5 分钟）
+推荐路线：**[DEPLOY-KOYEB.md](DEPLOY-KOYEB.md)**（Koyeb，真免费套餐，**不需要信用卡**，自带免费 PostgreSQL，约 5 分钟）
 
 备用路线：
+- **[DEPLOY-ZEABUR.md](DEPLOY-ZEABUR.md)** —— Zeabur（现在默认引导购买独立服务器，需留意）
 - **[DEPLOY-RENDER.md](DEPLOY-RENDER.md)** —— Render（需 Visa/Mastercard 验证身份，银联卡不行）
 - **[DEPLOY.md](DEPLOY.md)** —— 腾讯云 CloudBase（**体验版不支持本应用所需能力，会部署失败**）
 
